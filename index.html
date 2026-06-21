@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACROZELA Case Investigation Tool - Professional evidence and case management system. Built by ACROZELA TECH.">
+    <meta name="keywords" content="Case Investigation, Acrozela, Evidence Tracker, Investigation Timeline, Legal Tool">
+    <title>ACROZELA CASE INVESTIGATION TOOL</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: var(--surface);
+            border-bottom: 2px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            color: var(--primary);
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            gap: 1rem;
+            background: var(--surface);
+            padding: 0.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary);
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+
+        .nav-btn.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card & UI Elements */
+        .card {
+            background: var(--surface);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { opacity: 0.9; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Form Controls */
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        /* Tables / Lists */
+        .data-list { width: 100%; border-collapse: collapse; }
+        .data-list th { text-align: left; padding: 1rem; border-bottom: 2px solid var(--border); color: var(--text-muted); }
+        .data-list td { padding: 1rem; border-bottom: 1px solid var(--border); }
+
+        /* Timeline Specific */
+        .timeline-item {
+            border-left: 3px solid var(--primary);
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .footer-brand {
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            main { padding: 1rem; }
+            .header-action { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .data-list thead { display: none; }
+            .data-list tr { display: block; border: 1px solid var(--border); margin-bottom: 1rem; padding: 1rem; border-radius: 8px; }
+            .data-list td { display: block; padding: 0.5rem 0; text-align: right; }
+            .data-list td::before { content: attr(data-label); float: left; font-weight: bold; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">ACROZELA CASE INVESTIGATION TOOL</div>
+    </header>
+
+    <nav>
+        <button class="nav-btn active" onclick="showView('cases')">CASE RECORDS</button>
+        <button class="nav-btn" onclick="showView('timeline')">TIMELINE</button>
+        <button class="nav-btn" onclick="showView('evidence')">EVIDENCE TRACKER</button>
+    </nav>
+
+    <main id="app-container">
+        <!-- Case Records View -->
+        <section id="view-cases" class="view-section active">
+            <div class="header-action">
+                <h2>Case Records</h2>
+                <button class="btn btn-primary" onclick="openModal('caseModal')">+ New Case</button>
+            </div>
+            <div id="cases-list">
+                <div class="empty-state">
+                    <span class="empty-state-icon">📂</span>
+                    <p>No cases found. Start by creating a new investigation case.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline View -->
+        <section id="view-timeline" class="view-section">
+            <div class="header-action">
+                <h2>Investigation Timeline</h2>
+                <button class="btn btn-primary" onclick="openModal('timelineModal')">+ Add Event</button>
+            </div>
+            <div id="timeline-list">
+                <div class="empty-state">
+                    <span class="empty-state-icon">🕒</span>
+                    <p>No events recorded in the timeline yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Evidence View -->
+        <section id="view-evidence" class="view-section">
+            <div class="header-action">
+                <h2>Evidence Tracker</h2>
+                <button class="btn btn-primary" onclick="openModal('evidenceModal')">+ Log Evidence</button>
+            </div>
+            <div id="evidence-list">
+                <div class="empty-state">
+                    <span class="empty-state-icon">🔍</span>
+                    <p>No evidence items tracked for this investigation.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <span class="footer-brand">ACROZELA CASE INVESTIGATION</span>
+        DEVELOPED BY ACROZELA TECH
+    </footer>
+
+    <!-- MODALS -->
+    <!-- Case Modal -->
+    <div id="caseModal" class="modal">
+        <div class="modal-content">
+            <h3>Create New Case</h3><br>
+            <form id="caseForm">
+                <div class="form-group">
+                    <label>Case Title</label>
+                    <input type="text" id="caseTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Client Name</label>
+                    <input type="text" id="caseClient" required>
+                </div>
+                <div class="form-group">
+                    <label>Investigation Budget (INR)</label>
+                    <input type="number" id="caseBudget" placeholder="₹ 0.00" required>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Save Case</button>
+                    <button type="button" class="btn" onclick="closeModal('caseModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Timeline Modal -->
+    <div id="timelineModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Timeline Event</h3><br>
+            <form id="timelineForm">
+                <div class="form-group">
+                    <label>Event Title</label>
+                    <input type="text" id="eventTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="eventDesc" rows="3"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Add Event</button>
+                    <button type="button" class="btn" onclick="closeModal('timelineModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Evidence Modal -->
+    <div id="evidenceModal" class="modal">
+        <div class="modal-content">
+            <h3>Log New Evidence</h3><br>
+            <form id="evidenceForm">
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="evidenceItem" required>
+                </div>
+                <div class="form-group">
+                    <label>Collection Location</label>
+                    <input type="text" id="evidenceLoc" required>
+                </div>
+                <div class="form-group">
+                    <label>Tag Number</label>
+                    <input type="text" id="evidenceTag" placeholder="e.g. AC-990">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Log Evidence</button>
+                    <button type="button" class="btn" onclick="closeModal('evidenceModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data State Management
+        let db = {
+            cases: JSON.parse(localStorage.getItem('ac_cases')) || [],
+            timeline: JSON.parse(localStorage.getItem('ac_timeline')) || [],
+            evidence: JSON.parse(localStorage.getItem('ac_evidence')) || []
+        };
+
+        const saveData = () => {
+            localStorage.setItem('ac_cases', JSON.stringify(db.cases));
+            localStorage.setItem('ac_timeline', JSON.stringify(db.timeline));
+            localStorage.setItem('ac_evidence', JSON.stringify(db.evidence));
+            renderAll();
+        };
+
+        // Navigation
+        function showView(viewId) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('view-' + viewId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Modal Logic
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Currency Formatter
+        const formatINR = (amt) => {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+            }).format(amt);
+        };
+
+        // CRUD Operations
+        document.getElementById('caseForm').onsubmit = (e) => {
+            e.preventDefault();
+            const newCase = {
+                id: Date.now(),
+                title: document.getElementById('caseTitle').value,
+                client: document.getElementById('caseClient').value,
+                budget: document.getElementById('caseBudget').value,
+                date: new Date().toLocaleDateString()
+            };
+            db.cases.push(newCase);
+            saveData();
+            e.target.reset();
+            closeModal('caseModal');
+        };
+
+        document.getElementById('timelineForm').onsubmit = (e) => {
+            e.preventDefault();
+            const event = {
+                id: Date.now(),
+                title: document.getElementById('eventTitle').value,
+                date: document.getElementById('eventDate').value,
+                desc: document.getElementById('eventDesc').value
+            };
+            db.timeline.push(event);
+            saveData();
+            e.target.reset();
+            closeModal('timelineModal');
+        };
+
+        document.getElementById('evidenceForm').onsubmit = (e) => {
+            e.preventDefault();
+            const item = {
+                id: Date.now(),
+                name: document.getElementById('evidenceItem').value,
+                loc: document.getElementById('evidenceLoc').value,
+                tag: document.getElementById('evidenceTag').value
+            };
+            db.evidence.push(item);
+            saveData();
+            e.target.reset();
+            closeModal('evidenceModal');
+        };
+
+        function deleteItem(type, id) {
+            db[type] = db[type].filter(item => item.id !== id);
+            saveData();
+        }
+
+        // Rendering Logic
+        function renderAll() {
+            // Cases
+            const casesContainer = document.getElementById('cases-list');
+            if(db.cases.length === 0) {
+                casesContainer.innerHTML = `<div class="empty-state"><span class="empty-state-icon">📂</span><p>No cases found.</p></div>`;
+            } else {
+                let html = `<table class="data-list"><thead><tr><th>Case Title</th><th>Client</th><th>Budget</th><th>Created</th><th>Action</th></tr></thead><tbody>`;
+                db.cases.forEach(c => {
+                    html += `<tr>
+                        <td data-label="Title"><strong>${c.title}</strong></td>
+                        <td data-label="Client">${c.client}</td>
+                        <td data-label="Budget">${formatINR(c.budget)}</td>
+                        <td data-label="Date">${c.date}</td>
+                        <td data-label="Action"><button class="btn" style="color:var(--danger)" onclick="deleteItem('cases', ${c.id})">Delete</button></td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+                casesContainer.innerHTML = html;
+            }
+
+            // Timeline
+            const timelineContainer = document.getElementById('timeline-list');
+            if(db.timeline.length === 0) {
+                timelineContainer.innerHTML = `<div class="empty-state"><span class="empty-state-icon">🕒</span><p>No events recorded.</p></div>`;
+            } else {
+                let html = '';
+                db.timeline.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
+                    html += `<div class="timeline-item card">
+                        <small style="color:var(--primary); font-weight:bold">${t.date}</small>
+                        <h4>${t.title}</h4>
+                        <p>${t.desc}</p>
+                        <button class="btn" style="color:var(--danger); padding:0; margin-top:10px" onclick="deleteItem('timeline', ${t.id})">Remove</button>
+                    </div>`;
+                });
+                timelineContainer.innerHTML = html;
+            }
+
+            // Evidence
+            const evidenceContainer = document.getElementById('evidence-list');
+            if(db.evidence.length === 0) {
+                evidenceContainer.innerHTML = `<div class="empty-state"><span class="empty-state-icon">🔍</span><p>No evidence tracked.</p></div>`;
+            } else {
+                let html = `<table class="data-list"><thead><tr><th>Item Name</th><th>Location</th><th>Tag #</th><th>Action</th></tr></thead><tbody>`;
+                db.evidence.forEach(e => {
+                    html += `<tr>
+                        <td data-label="Item"><strong>${e.name}</strong></td>
+                        <td data-label="Location">${e.loc}</td>
+                        <td data-label="Tag">${e.tag}</td>
+                        <td data-label="Action"><button class="btn" style="color:var(--danger)" onclick="deleteItem('evidence', ${e.id})">Delete</button></td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+                evidenceContainer.innerHTML = html;
+            }
+        }
+
+        // Initial Load
+        window.onload = renderAll;
+    </script>
+</body>
+</html>
